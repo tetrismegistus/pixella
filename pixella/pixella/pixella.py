@@ -3,10 +3,14 @@ from PIL import Image
 
 
 class Downsampler:
-    def downsample(self, filename):
+    def __init__(self, filename):
+        self.filename = filename
+
+    def downsample(self):
         return Image.open('out.png')
 
-    def get_pixels(self, filename):
-        img = Image.open(filename)
-        return list(img.getdata())
-
+    def get_pixels_as_rows(self):
+        img = Image.open(self.filename)
+        w, h = img.size
+        pixel_list = list(img.getdata())
+        return [pixel_list[i * w:(i + 1) * w] for i in range(h)]
