@@ -10,13 +10,17 @@ class Downsampler:
         self.w, self.h = img.size
         self.pixels_as_rows = self.get_pixels_as_rows(img)
         new_image = self.get_new_image(rescale=rescale, sample_rate=sample_rate)
+        self.new_image = self.downsample(new_image, sample_rate=sample_rate, rescale=rescale)
 
-    def downsample(self, img, sample_rate=10):
+    def downsample(self, img, sample_rate=None, rescale=False):
         drawing = ImageDraw.Draw(img)
         for row in range(0, self.h, sample_rate):
             for col in range(0, self.w, sample_rate):
                 fill = self.pixels_as_rows[row][col]
-                drawing.rectangle([(col, row), (col + sample_rate, row + sample_rate)], fill=fill)
+                if rescale:
+                    drawing.point([(col / sample_rate, row / sample_rate)], fill=fill)
+                else:
+                    drawing.rectangle([(col, row), (col + sample_rate, row + sample_rate)], fill=fill)
         return img
 
     def get_pixels_as_rows(self, img):
@@ -27,5 +31,9 @@ class Downsampler:
         if rescale:
             def rescale(x): return int(x / sample_rate) + 1
             return Image.new('RGB', size=(rescale(self.w), rescale(self.h)))
+        else:
+            return Image.new('RGB', size=(self.w, self.h))
 
-        return Image.new('RGB', size=(self.w, self.h))
+    @staticmethod
+    def save_image(image, filename):
+        image.save(filename)

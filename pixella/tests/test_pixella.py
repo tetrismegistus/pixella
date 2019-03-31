@@ -14,9 +14,18 @@ def test_downsample_brain():
     downsampler = pixella.Downsampler('brain.png')
     from PIL import Image
     img = downsampler.get_new_image()
-    result = downsampler.downsample(img)
+    result = downsampler.downsample(img, sample_rate=10)
     comparison = Image.open('out.png')
     assert list(comparison.getdata()) == list(result.getdata())
+
+
+def test_downsample_brain_rescale():
+    downsampler = pixella.Downsampler('brain.png')
+    from PIL import Image
+    img = downsampler.get_new_image(rescale=True, sample_rate=10)
+    result = downsampler.downsample(img, sample_rate=10, rescale=True)
+    comparison = Image.open('rescaled_brain.png')
+    assert list(result.getdata()) == list(comparison.getdata())
 
 
 def test_get_pixels_as_rows():
@@ -30,24 +39,17 @@ def test_get_pixels_as_rows():
     assert result == desired_values
 
 
-def test_get_new_image_surface_no_size_loss():
+def test_get_new_image_no_rescale():
     downsampler = pixella.Downsampler('100x100.png')
     result = downsampler.get_new_image()
     w, h = result.size
     assert w == 100
     assert h == 100
 
-def test_get_new_image_no_size_loss():
-    downsampler = pixella.Downsampler('100x100.png')
-    result = downsampler.get_new_image()
-    w, h = result.size
-    assert w == 100
-    assert h == 100
 
-def test_get_new_image_shrink():
+def test_get_new_image_rescale():
     downsampler = pixella.Downsampler('100x100.png')
     result = downsampler.get_new_image(rescale=True, sample_rate=20)
     w, h = result.size
     assert w == 6
     assert h == 6
-
